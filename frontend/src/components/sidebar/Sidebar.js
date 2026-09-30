@@ -5,12 +5,16 @@ import {RiMedicineBottleFill} from "react-icons/ri";
 import menu from "../../data/sidebar";
 import SidebarItem from './SidebarItem';
 import { useNavigate } from 'react-router-dom';
+import { useSelector } from 'react-redux';
+import { selectUser } from '../../redux/features/auth/authSlice';
 
 const Sidebar = ({children}) => {
 
     const [isOpen, setIsOpen] = useState(true);
     const toggle = () => setIsOpen(!isOpen);
     const navigate = useNavigate();
+    const user = useSelector(selectUser);
+    const visibleMenu = menu.filter((item) => !item.adminOnly || user.role === "admin");
 
     const goHome = () => {
         navigate("/");
@@ -28,7 +32,7 @@ const Sidebar = ({children}) => {
                     <HiMenuAlt3  onClick={toggle}/>
                 </div>
             </div>
-            {menu.map((item, index) => {
+            {visibleMenu.map((item, index) => {
                 return <SidebarItem key={index} item={item} isOpen={isOpen} />
             })}
         </div>

@@ -6,7 +6,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
 import {toast} from "react-toastify";
 import { loginUser, validateEmail } from '../../services/authService';
-import { SET_LOGIN, SET_NAME } from '../../redux/features/auth/authSlice';
+import { SET_LOGIN, SET_NAME, SET_USER } from '../../redux/features/auth/authSlice';
 import Loader from '../../components/loader/Loader';
 
 const initialState = {
@@ -44,10 +44,14 @@ const Login = () => {
         setIsLoading(true);
         try {
             const data = await loginUser(userData);
-            console.log(data);
+            if (!data) {
+                setIsLoading(false);
+                return;
+            }
             await dispatch(SET_LOGIN(true));
             await dispatch(SET_NAME(data.name));
-            navigate("/dashboard");
+            await dispatch(SET_USER(data));
+            navigate(data.access === "blocked" ? "/blocked" : "/dashboard");
             setIsLoading(false);
         } catch (error) {
             setIsLoading(false);

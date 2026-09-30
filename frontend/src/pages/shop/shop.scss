@@ -1,0 +1,47 @@
+.shop-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 1rem 0 2rem;
+}
+
+.shop-table th,
+.shop-table td {
+  border-bottom: 1px solid #ddd;
+  text-align: left;
+  padding: 0.7rem;
+  vertical-align: top;
+}
+
+.shop-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+  margin: 1rem 0;
+}
+
+.shop-card {
+  max-width: 720px;
+}
+
+#roach-qr-reader {
+  max-width: 480px;
+}
+
+.shop-card input,
+.shop-actions input,
+.shop-table input,
+.shop-page input,
+#roach-qr-reader + input {
+  display: block;
+  font-size: 1.6rem;
+  padding: 0.8rem;
+  margin: 0.6rem 0 1rem;
+  border: 1px solid #777;
+  border-radius: 3px;
+  max-width: 420px;
+}
+
+.shop-actions input {
+  margin: 0;
+  max-width: 120px;
+}

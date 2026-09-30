@@ -4,8 +4,8 @@ WORKDIR /app
 
 COPY package.json package-lock.json ./
 # The lockfile is npm v1. npm 7+ rewrites it and refetches every package record,
-# which fails on flaky networks. npm 6 installs that lockfile directly.
-RUN npm install -g npm@6 && npm ci
+# which fails on flaky networks. npm 6 installs that lockfile as it is.
+RUN npm install -g npm@6 && npm ci --no-audit --no-fund
 
 COPY . .
 

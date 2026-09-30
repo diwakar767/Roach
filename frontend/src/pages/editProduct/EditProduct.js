@@ -17,6 +17,8 @@ const EditProduct = () => {
     const [productImage, setProductImage] = useState("");
     const [imagePreview, setImagePreview] = useState(null);
     const [description, setDescription] = useState("");
+    const [benefits, setBenefits] = useState("");
+    const [useCases, setUseCases] = useState("");
 
     useEffect(() => {
       dispatch(getProduct(id))
@@ -32,6 +34,12 @@ const EditProduct = () => {
         setDescription(
             productEdit && productEdit.description ? productEdit.description : ""
         )
+        setBenefits(
+            productEdit && productEdit.benefits ? productEdit.benefits : ""
+        )
+        setUseCases(
+            productEdit && productEdit.useCases ? productEdit.useCases : ""
+        )
     }, [productEdit])
 
     const handleInputChange = (e) => {
@@ -39,9 +47,13 @@ const EditProduct = () => {
         setProduct({...product, [name]: value});
     }
 
-    const handleImageChange = (e) => {
-        setProductImage(e.target.files[0]);
-        setImagePreview(URL.createObjectURL(e.target.files[0]));
+    const handleImageChange = (eventOrFile) => {
+        const file = eventOrFile?.target ? eventOrFile.target.files[0] : eventOrFile;
+        if (!file) {
+            return;
+        }
+        setProductImage(file);
+        setImagePreview(URL.createObjectURL(file));
     };
 
     const saveProduct = async (e) => {
@@ -51,7 +63,11 @@ const EditProduct = () => {
         formData.append("category", product?.category);
         formData.append("quantity", product?.quantity);
         formData.append("price", product?.price);
+        formData.append("cost", product?.cost ?? 0);
+        formData.append("reorderLevel", product?.reorderLevel ?? 5);
         formData.append("description", description);
+        formData.append("benefits", benefits);
+        formData.append("useCases", useCases);
         if(productImage) {
             formData.append("image", productImage);
         }
@@ -60,6 +76,7 @@ const EditProduct = () => {
 
         await dispatch(updateProduct({id, formData}));
         await dispatch(getProducts());
+        window.dispatchEvent(new Event("roach-notifications"));
 
         navigate("/dashboard");
     }
@@ -75,6 +92,10 @@ const EditProduct = () => {
             imagePreview={imagePreview}
             description={description}
             setDescription={setDescription}
+            benefits={benefits}
+            setBenefits={setBenefits}
+            useCases={useCases}
+            setUseCases={setUseCases}
             handleInputChange={handleInputChange}
             handleImageChange={handleImageChange}
             saveProduct={saveProduct}

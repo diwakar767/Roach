@@ -23,7 +23,8 @@ const Contact = () => {
             setMessage("");
             toast.success(response.data.message);
         } catch (error) {
-            toast.error(error.message);
+            const message = (error.response && error.response.data && error.response.data.message) || error.message;
+            toast.error(message);
         }
     };
 

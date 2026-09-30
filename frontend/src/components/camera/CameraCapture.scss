@@ -1,0 +1,10 @@
+.camera-capture video {
+  width: 100%;
+  max-width: 480px;
+  background: #111;
+  border-radius: 4px;
+}
+
+.camera-capture .--btn + .--btn {
+  margin-left: 1rem;
+}

@@ -34,6 +34,18 @@ const userSchema = mongoose.Schema({
         type: String,
         default: "bio",
         maxLength: [250, "Bio must not be more than 250 characters"]
+    },
+    role: {
+        type: String,
+        enum: ["user", "admin"],
+        default: "user"
+    },
+    trialEndsAt: {
+        type: Date
+    },
+    paidUntil: {
+        type: Date,
+        default: null
     }
 }, {
     timestamps: true,

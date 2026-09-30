@@ -1,6 +1,7 @@
 const asyncHandler = require("express-async-handler")
 const User = require("../models/userModel");
 const jwt = require("jsonwebtoken");
+const { ensureTrial } = require("../utils/access");
 
 const protect = asyncHandler(async(req, res, next) => {
     try {
@@ -21,6 +22,10 @@ const protect = asyncHandler(async(req, res, next) => {
         if(!user) {
             res.status(401)
             throw new Error("User not found");
+        }
+
+        if (ensureTrial(user)) {
+            await user.save();
         }
 
         req.user = user;

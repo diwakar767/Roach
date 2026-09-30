@@ -20,6 +20,8 @@ PORT=5000
 EMAIL_HOST=
 EMAIL_USER=
 EMAIL_PASS=
+ADMIN_EMAIL=admin@example.com
+ADMIN_PASSWORD=change-me-admin
 CLOUDINARY_CLOUD_NAME=
 CLOUDINARY_API_KEY=
 CLOUDINARY_API_SECRET=
@@ -59,3 +61,4 @@ The dev server listens on port 3000. The API CORS list includes `http://localhos
 - Do not commit `.env` files, the `uploads` image files, or the `.ai` folder.
 - `COOKIE_SECURE=false` is required for login on plain HTTP. A `Secure` cookie is dropped by the browser on `http://localhost`.
 - Forgot-password links use `FRONTEND_URL`, so that value must be the origin you open in the browser.
+- The frontend lockfile is npm lockfileVersion 1 and includes `html5-qrcode` and `qrcode.react`. Install it with npm 6. npm 7 and newer try to rewrite that lockfile. The Docker image runs `npm ci` with npm 6.

@@ -10,6 +10,8 @@ const initialState = {
     category: "",
     quantity: "",
     price: "",
+    cost: "0",
+    reorderLevel: "5",
 }
 
 const AddProduct = () => {
@@ -21,19 +23,25 @@ const AddProduct = () => {
     const [productImage, setProductImage] = useState("");
     const [imagePreview, setImagePreview] = useState(null);
     const [description, setDescription] = useState("");
+    const [benefits, setBenefits] = useState("");
+    const [useCases, setUseCases] = useState("");
 
     const isLoading = useSelector(selectIsLoading);
 
-    const {name, category, price, quantity} = product;
+    const {name, category, price, cost, quantity, reorderLevel} = product;
 
     const handleInputChange = (e) => {
         const { name, value } = e.target;
         setProduct({...product, [name]: value});
     }
 
-    const handleImageChange = (e) => {
-        setProductImage(e.target.files[0]);
-        setImagePreview(URL.createObjectURL(e.target.files[0]));
+    const handleImageChange = (eventOrFile) => {
+        const file = eventOrFile?.target ? eventOrFile.target.files[0] : eventOrFile;
+        if (!file) {
+            return;
+        }
+        setProductImage(file);
+        setImagePreview(URL.createObjectURL(file));
     };
 
     const generateSKU = (category) => {
@@ -51,12 +59,19 @@ const AddProduct = () => {
         formData.append("category", category);
         formData.append("quantity", quantity);
         formData.append("price", price);
+        formData.append("cost", cost);
+        formData.append("reorderLevel", reorderLevel);
         formData.append("description", description);
-        formData.append("image", productImage);
+        formData.append("benefits", benefits);
+        formData.append("useCases", useCases);
+        if (productImage) {
+            formData.append("image", productImage);
+        }
 
         console.log(...formData);
 
         await dispatch(createProduct(formData));
+        window.dispatchEvent(new Event("roach-notifications"));
 
         navigate("/dashboard");
     }
@@ -71,6 +86,10 @@ const AddProduct = () => {
             imagePreview={imagePreview}
             description={description}
             setDescription={setDescription}
+            benefits={benefits}
+            setBenefits={setBenefits}
+            useCases={useCases}
+            setUseCases={setUseCases}
             handleInputChange={handleInputChange}
             handleImageChange={handleImageChange}
             saveProduct={saveProduct}

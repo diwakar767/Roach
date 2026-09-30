@@ -6,7 +6,10 @@ const { response } = require("express");
 const Token = require("../models/tokenModel");
 const crypto = require("crypto");
 const sendEmail = require("../utils/sendEmail");
+const { emailConfigured, EMAIL_UNAVAILABLE, rejectEmailError } = sendEmail;
 const { storeUploadedImage } = require("../utils/storeImage");
+const presentUser = require("../utils/presentUser");
+const { trialEndFrom } = require("../utils/access");
 
 const generateToken = (id) => {
     return jwt.sign({id}, process.env.JWT_SECRET, {expiresIn: "1d"})
@@ -52,7 +55,8 @@ const registerUser = asyncHandler(async (req, res) => {
     const user = await User.create({
         name,
         email,
-        password
+        password,
+        trialEndsAt: trialEndFrom(new Date())
     });
     
     //Generate Token
@@ -64,9 +68,10 @@ const registerUser = asyncHandler(async (req, res) => {
     res.cookie("token", token, tokenCookieOptions(new Date(Date.now() + 1000 * 86400)));
 
     if(user) {
-        const {_id, name, email, photo, phone, bio} = user
+        const profile = await presentUser(user);
         res.status(201).json({
-            _id, name, email, photo, phone, bio, token
+            ...profile,
+            token
         });
     } else {
         res.status(400);
@@ -105,9 +110,10 @@ const loginUser = asyncHandler(async (req, res) => {
 
     if(user && passwordIsCorrect) {
         res.cookie("token", token, tokenCookieOptions(new Date(Date.now() + 1000 * 86400)));
-        const {_id, name, email, photo, phone, bio} = user
+        const profile = await presentUser(user);
         res.status(200).json({
-            _id, name, email, photo, phone, bio, token 
+            ...profile,
+            token
         });
     } else {
         res.status(400);
@@ -129,10 +135,7 @@ const getUser = asyncHandler(async(req, res) => {
     const user = await User.findById(req.user._id)
 
     if(user) {
-        const {_id, name, email, photo, phone, bio} = user
-        res.status(200).json({
-            _id, name, email, photo, phone, bio
-        });
+        res.status(200).json(await presentUser(user));
     } else {
         res.status(400);
         throw new Error("User not found");
@@ -171,14 +174,7 @@ const updateUser = asyncHandler(async(req, res) => {
     
 
         const updatedUser = await user.save();
-        res.status(200).json({
-            _id : updatedUser._id, 
-            name : updatedUser.name, 
-            email : updatedUser.email, 
-            photo : updatedUser.photo, 
-            phone : updatedUser.phone, 
-            bio : updatedUser.bio
-        });
+        res.status(200).json(await presentUser(updatedUser));
     } else {
         res.status(404);
         throw new Error("User Not Found");
@@ -220,6 +216,11 @@ const changePassword = asyncHandler(async (req, res) => {
 });
 
 const forgotPassword = asyncHandler(async (req, res) => {
+    if (!emailConfigured()) {
+        res.status(503);
+        throw new Error(EMAIL_UNAVAILABLE);
+    }
+
     const {email} = req.body;
     const user = await User.findOne({email});
 
@@ -279,8 +280,7 @@ const forgotPassword = asyncHandler(async (req, res) => {
             message: "Reset Email Sent"
         });
     } catch (error) {
-        res.status(500);
-        throw new Error("Email not sent, please try again");
+        rejectEmailError(res, error);
     }
 });
 

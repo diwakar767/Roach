@@ -3,6 +3,8 @@ import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { selectName, SET_LOGIN } from '../../redux/features/auth/authSlice';
 import { logoutUser } from '../../services/authService';
+import NotificationBell from '../notifications/NotificationBell';
+import "./Header.scss";
 
 const Header = () => {
   const dispatch = useDispatch();
@@ -21,11 +23,14 @@ const Header = () => {
                 <span className="--fw-thin">Welcome, </span>
                 <span className="--color-danger">{name}</span>
             </h3>
-            <button onClick={logout} className="--btn --btn-danger">Logout</button>
+            <div className="header-actions">
+                <NotificationBell />
+                <button onClick={logout} className="--btn --btn-danger">Logout</button>
+            </div>
         </div>
         <hr />
     </div>
   )
 }
 
-export default Header
+export default Header;

@@ -23,19 +23,33 @@ const productSchema = mongoose.Schema({
         trim: true
     },
     quantity: {
-        type: String,
-        required: [true, "Please add a quantity"],
-        trim: true
+        type: Number,
+        required: [true, "Please add a quantity"]
     },
     price: {
-        type: String,
-        required: [true, "Please add a price"],
-        trim: true
+        type: Number,
+        required: [true, "Please add a price"]
+    },
+    cost: {
+        type: Number,
+        default: 0
+    },
+    reorderLevel: {
+        type: Number,
+        default: 5
     },
     description: {
         type: String,
         required: [true, "Please add a description"],
         trim: true
+    },
+    benefits: {
+        type: String,
+        default: ""
+    },
+    useCases: {
+        type: String,
+        default: ""
     },
     image: {
         type: Object,

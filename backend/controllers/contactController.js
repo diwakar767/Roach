@@ -1,6 +1,7 @@
 const asyncHandler = require("express-async-handler");
 const User = require("../models/userModel");
 const sendEmail = require("../utils/sendEmail");
+const { emailConfigured, EMAIL_UNAVAILABLE, rejectEmailError } = sendEmail;
 
 const contactUs = asyncHandler(async (req, res) => {
   const { subject, message } = req.body;
@@ -17,6 +18,11 @@ const contactUs = asyncHandler(async (req, res) => {
     throw new Error("Please add subject and message");
   }
 
+  if (!emailConfigured()) {
+    res.status(503);
+    throw new Error(EMAIL_UNAVAILABLE);
+  }
+
   const send_to = process.env.EMAIL_USER;
   const sent_from = process.env.EMAIL_USER;
   const reply_to = user.email;
@@ -24,8 +30,7 @@ const contactUs = asyncHandler(async (req, res) => {
     await sendEmail(subject, message, send_to, sent_from, reply_to);
     res.status(200).json({ success: true, message: "Email Sent" });
   } catch (error) {
-    res.status(500);
-    throw new Error("Email not sent, please try again");
+    rejectEmailError(res, error);
   }
 });
 

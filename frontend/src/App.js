@@ -20,8 +20,39 @@ import EditProduct from "./pages/editProduct/EditProduct";
 import Profile from "./pages/profile/Profile";
 import EditProfile from "./pages/profile/EditProfile";
 import Contact from "./pages/contact/Contact";
+import ShopGate from "./components/protect/ShopGate";
+import Scan from "./pages/scan/Scan";
+import Stock from "./pages/stock/Stock";
+import Checkout from "./pages/checkout/Checkout";
+import Reports from "./pages/reports/Reports";
+import InvoiceDetail from "./pages/reports/InvoiceDetail";
+import Admin from "./pages/admin/Admin";
+import Blocked from "./pages/access/Blocked";
 
 axios.defaults.withCredentials = true;
+
+axios.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    const message = error.response && error.response.data && error.response.data.message;
+    if (error.response && error.response.status === 403 && message === "Account access is paused") {
+      if (window.location.pathname !== "/blocked") {
+        window.location.assign("/blocked");
+      }
+    }
+    return Promise.reject(error);
+  }
+);
+
+const shopPage = (page, adminOnly = false) => (
+  <ShopGate adminOnly={adminOnly}>
+    <Sidebar>
+      <Layout>
+        {page}
+      </Layout>
+    </Sidebar>
+  </ShopGate>
+);
 
 function App() {
   const dispatch = useDispatch();
@@ -42,69 +73,21 @@ function App() {
         <Route path="/register" element={<Register />} />
         <Route path="/forgot" element={<Forgot />} />
         <Route path="/resetpassword/:resetToken" element={<Reset />} />
+        <Route path="/blocked" element={<Blocked />} />
 
-        <Route path="/dashboard" element={
-          <Sidebar>
-            <Layout>
-              <Dashboard></Dashboard>
-            </Layout>
-          </Sidebar>
-        }
-        />
-
-        <Route path="/add-product" element={
-          <Sidebar>
-            <Layout>
-              <AddProduct />
-            </Layout>
-          </Sidebar>
-        } 
-        />
-
-        <Route path="/product-detail/:id" element={
-          <Sidebar>
-            <Layout>
-              <ProductDetail />
-            </Layout>
-          </Sidebar>
-        } 
-        />
-
-        <Route path="/edit-product/:id" element={
-          <Sidebar>
-            <Layout>
-              <EditProduct />
-            </Layout>
-          </Sidebar>
-        } 
-        />
-
-        <Route path="/profile" element={
-          <Sidebar>
-            <Layout>
-              <Profile />
-            </Layout>
-          </Sidebar>
-        } 
-        />
-
-        <Route path="/edit-profile" element={
-          <Sidebar>
-            <Layout>
-              <EditProfile />
-            </Layout>
-          </Sidebar>
-        } 
-        />
-
-        <Route path="/contact-us" element={
-          <Sidebar>
-            <Layout>
-              <Contact />
-            </Layout>
-          </Sidebar>
-        } 
-        />
+        <Route path="/dashboard" element={shopPage(<Dashboard />)} />
+        <Route path="/add-product" element={shopPage(<AddProduct />)} />
+        <Route path="/product-detail/:id" element={shopPage(<ProductDetail />)} />
+        <Route path="/edit-product/:id" element={shopPage(<EditProduct />)} />
+        <Route path="/profile" element={shopPage(<Profile />)} />
+        <Route path="/edit-profile" element={shopPage(<EditProfile />)} />
+        <Route path="/contact-us" element={shopPage(<Contact />)} />
+        <Route path="/scan" element={shopPage(<Scan />)} />
+        <Route path="/stock/:id" element={shopPage(<Stock />)} />
+        <Route path="/checkout" element={shopPage(<Checkout />)} />
+        <Route path="/reports" element={shopPage(<Reports />)} />
+        <Route path="/invoice/:id" element={shopPage(<InvoiceDetail />)} />
+        <Route path="/admin" element={shopPage(<Admin />, true)} />
       </Routes>
     </BrowserRouter>
   );

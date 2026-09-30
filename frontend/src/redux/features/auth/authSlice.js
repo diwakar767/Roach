@@ -11,6 +11,10 @@ const initialState = {
       phone: "",
       bio: "",
       photo: "",
+      role: "user",
+      access: "",
+      trialEndsAt: null,
+      paidUntil: null,
     },
 }
 
@@ -32,6 +36,10 @@ const authSlice = createSlice({
       state.user.phone = profile.phone;
       state.user.bio = profile.bio;
       state.user.photo = profile.photo;
+      state.user.role = profile.role || "user";
+      state.user.access = profile.access || "";
+      state.user.trialEndsAt = profile.trialEndsAt || null;
+      state.user.paidUntil = profile.paidUntil || null;
     }
   }
 });
